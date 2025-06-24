@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fitness Progress & Dynamic Workout Plan</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: #f0f8ff;
+      text-align: center;
+      padding: 40px;
+      font-family: Arial, sans-serif;
+    }
+    .chart-container {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+    }
+    canvas {
+      width: 100% !important;
+      height: 500px !important;
+    }
+    .workout-plan {
+      max-width: 600px;
+      margin: 40px auto 0;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    .workout-plan h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #007bff;
+    }
+    .workout-plan ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+    label, select {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    select {
+      padding: 6px 10px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📈 Fitness Progress Chart (Dynamic)</h2>
+  <div class="chart-container">
+    <canvas id="fitnessChart"></canvas>
+  </div>
+
+  <!-- Fitness goal selector -->
+  <div style="margin-top: 50px;">
+    <label for="fitnessGoal">Select Your Fitness Goal:</label>
+    <select id="fitnessGoal" onchange="generateWorkoutPlan()">
+      <option value="weight-loss">Weight Loss</option>
+      <option value="muscle-gain">Muscle Gain</option>
+      <option value="endurance">Endurance</option>
+      <option value="flexibility">Flexibility</option>
+      <option value="athletic">Athletic Performance</option>
+    </select>
+  </div>
+
+  <!-- Workout plan display -->
+  <div class="workout-plan" id="workoutPlanContainer" style="display:none;">
+    <h3>Your AI-Recommended Weekly Workout Plan</h3>
+    <ul id="workoutPlanList"></ul>
+  </div>
+
+  <!-- Script starts here -->
+  <script>
+    const ctx = document.getElementById('fitnessChart').getContext('2d');
+
+    const chartDataByGoal = {
+      "weight-loss": [5, 15, 25, 40, 60, 80],
+      "muscle-gain": [10, 20, 30, 50, 70, 90],
+      "endurance": [20, 30, 50, 60, 75, 95],
+      "flexibility": [15, 25, 35, 50, 65, 85],
+      "athletic": [10, 25, 40, 60, 80, 100]
+    };
+
+    const fitnessChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+        datasets: [{
+          label: 'Fitness Score',
+          data: chartDataByGoal["weight-loss"],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: '#007bff',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Fitness Score'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time (Weekly)'
+            }
+          }
+        }
+      }
+    });
+
+    const workoutPlans = {
+      "weight-loss": [
+        "Monday: Cardio (30-45 mins) + Full Body Stretch",
+        "Tuesday: HIIT Training + Core Workouts",
+        "Wednesday: Active Rest (Yoga or Walk)",
+        "Thursday: Circuit Training (Weights + Cardio)",
+        "Friday: Steady-State Cardio + Abs",
+        "Saturday: Outdoor Activities or Swimming",
+        "Sunday: Rest & Recovery"
+      ],
+      "muscle-gain": [
+        "Monday: Chest + Triceps Weight Training",
+        "Tuesday: Back + Biceps Weight Training",
+        "Wednesday: Legs + Lower Body Weight Training",
+        "Thursday: Core & Abs + Light Cardio",
+        "Friday: Shoulders + Arms Weight Training",
+        "Saturday: Full Body Workout",
+        "Sunday: Rest & Protein-rich diet focus"
+      ],
+      "endurance": [
+        "Monday: Long-distance steady cardio (running, cycling)",
+        "Tuesday: Interval running + Core workouts",
+        "Wednesday: Active Rest (Light yoga or stretching)",
+        "Thursday: Hill sprints + leg strength training",
+        "Friday: Swimming or rowing machine",
+        "Saturday: Mixed cardio activities",
+        "Sunday: Rest and light stretching"
+      ],
+      "flexibility": [
+        "Monday: Dynamic stretching + Yoga flow",
+        "Tuesday: Pilates session + Core strengthening",
+        "Wednesday: Rest or light walking",
+        "Thursday: Deep stretching + Mobility drills",
+        "Friday: Yoga balance poses + Breathing exercises",
+        "Saturday: Light cardio + Stretching",
+        "Sunday: Rest and meditation"
+      ],
+      "athletic": [
+        "Monday: Speed and agility drills + Plyometrics",
+        "Tuesday: Strength training (compound lifts)",
+        "Wednesday: Mobility and recovery exercises",
+        "Thursday: Sport-specific drills",
+        "Friday: Core strength + Endurance training",
+        "Saturday: HIIT + Sprint training",
+        "Sunday: Rest & active recovery"
+      ]
+    };
+
+    function generateWorkoutPlan() {
+      const selectedGoal = document.getElementById('fitnessGoal').value;
+      const planList = workoutPlans[selectedGoal];
+
+      // Update chart data
+      fitnessChart.data.datasets[0].data = chartDataByGoal[selectedGoal];
+      fitnessChart.update();
+
+      // Update workout plan
+      const workoutPlanContainer = document.getElementById('workoutPlanContainer');
+      const workoutPlanList = document.getElementById('workoutPlanList');
+      workoutPlanList.innerHTML = "";
+      planList.forEach(dayPlan => {
+        const li = document.createElement('li');
+        li.textContent = dayPlan;
+        workoutPlanList.appendChild(li);
+      });
+
+      workoutPlanContainer.style.display = 'block';
+    }
+
+    // Initial load
+    window.onload = generateWorkoutPlan;
+  </script>
+
+</body>
+</html>
